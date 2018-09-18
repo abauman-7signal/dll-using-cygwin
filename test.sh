@@ -17,13 +17,13 @@ function processStatusOfLastCommand() {
 
 function compile() {
   displayMessage " C O M P I L I N G  => ${FUNCTIONAL_TEST}"
-  g++ -v -c ${FUNCTIONAL_TEST}.c -L./ -lHelloWorld
+  gcc -v -c ${FUNCTIONAL_TEST}.c -L./ -lHelloWorld
   processStatusOfLastCommand
 }
 
 function link() {
   displayMessage " L I N K I N G  =>  ${FUNCTIONAL_TEST}"
-  g++ -v -o ${FUNCTIONAL_TEST}.exe ${FUNCTIONAL_TEST}.o -L./ -lHelloWorld -lHelloWorld
+  gcc -v -o ${FUNCTIONAL_TEST}.exe ${FUNCTIONAL_TEST}.o -L./ -lHelloWorld
   processStatusOfLastCommand
 }
 

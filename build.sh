@@ -13,7 +13,7 @@ function compile() {
   echo ---------------------
   echo   C O M P I L I N G
   echo ---------------------
-  g++ -v -c ${MODULE}.cpp
+  gcc -v -c ${MODULE}.cpp
   processStatusOfLastCommand
 }
 
@@ -21,10 +21,7 @@ function link() {
   echo -----------------
   echo   L I N K I N G
   echo -----------------
-  g++ -v -shared -o ${MODULE}.dll ${MODULE}.o \
-      -Wl,--out-implib=lib${MODULE}.dll.a \
-      -Wl,--export-all-symbols \
-      -Wl,--enable-auto-import
+  gcc -v -shared -o ${MODULE}.dll ${MODULE}.o
   processStatusOfLastCommand
 }
 
