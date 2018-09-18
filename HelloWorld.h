@@ -1,8 +1,8 @@
 #ifndef _Included_HelloWorld
 #define _Included_HelloWorld
-// #ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-// #endif
+#endif
 /*
  * Class:     HelloWorld
  * Method:    print
@@ -10,7 +10,7 @@ extern "C" {
  */
 int printHello(void);
 
-// #ifdef __cplusplus
+#ifdef __cplusplus
 }
-// #endif
+#endif
 #endif
