@@ -1,6 +1,7 @@
 #include <cstdio>
+#include "HelloWorld.h"
 
-int main()
+int printHello(void)
 {
-  printf("Hello World!");
+  printf("A DLL says Hello World!");
 }
