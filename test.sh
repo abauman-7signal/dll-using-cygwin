@@ -16,19 +16,19 @@ function processStatusOfLastCommand() {
 }
 
 function compile() {
-  displayMessage " C O M P I L I N G  => ${FUNCTIONAL_TEST}"
+  displayMessage "C O M P I L I N G  => ${FUNCTIONAL_TEST}"
   gcc -v -c ${FUNCTIONAL_TEST}.c -L./ -lHelloWorld
   processStatusOfLastCommand
 }
 
 function link() {
-  displayMessage " L I N K I N G  =>  ${FUNCTIONAL_TEST}"
+  displayMessage "L I N K I N G  =>  ${FUNCTIONAL_TEST}"
   gcc -v -o ${FUNCTIONAL_TEST}.exe ${FUNCTIONAL_TEST}.o -L./ -lHelloWorld
   processStatusOfLastCommand
 }
 
 function runTest() {
-  displayMessage " R U N N I N G  =>  ${FUNCTIONAL_TEST}"
+  displayMessage "R U N N I N G  =>  ${FUNCTIONAL_TEST}"
   ./${FUNCTIONAL_TEST}.exe
   processStatusOfLastCommand
 }
@@ -36,3 +36,4 @@ function runTest() {
 compile
 link
 runTest
+displayMessage "FINISHED FUNCTIONAL TEST"

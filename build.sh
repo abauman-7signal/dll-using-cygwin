@@ -2,6 +2,12 @@
 
 MODULE=HelloWorld
 
+function displayMessage() {
+  echo --------------------------------------------------
+  echo "  ${1}"
+  echo --------------------------------------------------
+}
+
 function processStatusOfLastCommand() {
   if [ $? -ne 0 ] ; then
     echo "F A I L E D"
@@ -10,17 +16,13 @@ function processStatusOfLastCommand() {
 }
 
 function compile() {
-  echo ---------------------
-  echo   C O M P I L I N G
-  echo ---------------------
+  displayMessage "C O M P I L I N G  => ${MODULE}"
   gcc -v -c ${MODULE}.cpp
   processStatusOfLastCommand
 }
 
 function link() {
-  echo -----------------
-  echo   L I N K I N G
-  echo -----------------
+  displayMessage "L I N K I N G  =>  ${MODULE}"
   gcc -v -shared -o ${MODULE}.dll ${MODULE}.o
   processStatusOfLastCommand
 }
@@ -28,3 +30,4 @@ function link() {
 
 compile
 link
+displayMessage "S U C C E S S !!!!"
