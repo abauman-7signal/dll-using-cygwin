@@ -3,5 +3,5 @@
 
 int printHello(void)
 {
-  printf("A DLL says Hello World!");
+  printf("A DLL says Hello World!\n");
 }
