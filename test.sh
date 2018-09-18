@@ -8,21 +8,31 @@ function displayMessage() {
   echo --------------------------------------------------
 }
 
+function processStatusOfLastCommand() {
+  if [ $? -ne 0 ] ; then
+    echo "F A I L E D"
+    exit 1
+  fi
+}
+
 function compile() {
   displayMessage " C O M P I L I N G  => ${FUNCTIONAL_TEST}"
   g++ -v -c ${FUNCTIONAL_TEST}.c -L./ -lHelloWorld
+  processStatusOfLastCommand
 }
 
 function link() {
   displayMessage " L I N K I N G  =>  ${FUNCTIONAL_TEST}"
   g++ -v -o ${FUNCTIONAL_TEST}.exe ${FUNCTIONAL_TEST}.o -L./ -lHelloWorld -lHelloWorld
+  processStatusOfLastCommand
 }
 
 function runTest() {
   displayMessage " R U N N I N G  =>  ${FUNCTIONAL_TEST}"
-  ${FUNCTIONAL_TEST}.exe
+  ./${FUNCTIONAL_TEST}.exe
+  processStatusOfLastCommand
 }
 
 compile
 link
-# runTest
+runTest
