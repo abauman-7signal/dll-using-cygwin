@@ -5,6 +5,11 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <ctime>
+#include <time.h>
+#include <iomanip>
+#include <sstream>
+
 #ifndef UNICODE
 #define UNICODE
 #endif
@@ -47,6 +52,35 @@ typedef struct _WLAN_CALLBACK_INFO {
 } WLAN_CALLBACK_INFO;
 
 
+void printIeInfo(PWLAN_BSS_ENTRY pBssEntry) {
+	wprintf(L"Information Elements\n");
+}
+
+void printMacToStream(std::ostream& os, unsigned char MACData[])
+{
+	// Possibly add length assertion
+	char oldFill = os.fill('0');
+
+	os << std::setw(2) << std::hex << static_cast<unsigned int>(MACData[0]);
+	for (int i = 1; i < 6; ++i) {
+		os << ':' << std::setw(2) << std::hex << static_cast<unsigned int>(MACData[i]);
+	}
+
+	os.fill(oldFill);
+
+	// Possibly add:
+	// os << std::endl;
+}
+
+void formatTime(time_t timeToFormat, char * timeFormatted, int sizeOfBuffer)
+{
+	if (timeToFormat > 0) {
+		struct tm timeTm;
+		localtime_s(&timeTm, &timeToFormat);
+		strftime(timeFormatted, sizeOfBuffer, "%A %c", &timeTm);
+	}
+}
+
 void wlanCallback(WLAN_NOTIFICATION_DATA *scanNotificationData, PVOID myContext)
 {
 	WLAN_CALLBACK_INFO* callbackInfo = (WLAN_CALLBACK_INFO*)myContext;
@@ -70,9 +104,21 @@ void wlanCallback(WLAN_NOTIFICATION_DATA *scanNotificationData, PVOID myContext)
 		dwResult = WlanGetNetworkBssList(
 			hClient,
 			&pIfInfo->InterfaceGuid,
-			&pConnectInfo->wlanAssociationAttributes.dot11Ssid,
+			//&pConnectInfo->wlanAssociationAttributes.dot11Ssid,
+			NULL,
 			dot11_BSS_type_infrastructure, TRUE, NULL,
 			&pBssList);
+
+		//auto currentTime = std::chrono::system_clock::now();
+		//std::time_t currentTimeT = std::chrono::system_clock::to_time_t(currentTime);
+		//char timeBuff[70];
+		//strftime(timeBuff, sizeof timeBuff, "%A %c", currentTimeT);
+
+		time_t currentTime = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		char currentTimeFormatted[128];
+		formatTime(currentTime, currentTimeFormatted, sizeof currentTimeFormatted);
+
+		char accessPointTimeFormatted[128];
 
 		if (dwResult != ERROR_SUCCESS)
 		{
@@ -80,9 +126,19 @@ void wlanCallback(WLAN_NOTIFICATION_DATA *scanNotificationData, PVOID myContext)
 			return;
 		}
 
-		// Get the RSSI value
-		pBssEntry = &pBssList->wlanBssEntries[0];
-		wprintf(L"Rssi from BssList: %d\n", pBssEntry->lRssi);
+		for (DWORD i = 0; i < pBssList->dwNumberOfItems; i++)
+		{
+			// Get the RSSI value
+			pBssEntry = &pBssList->wlanBssEntries[i];
+			//wprintf(L"%s - Rssi from BssList: %d\n", timeBuff, pBssEntry->lRssi);
+			//std::cout << msg << " - RSSI from BssList: " << pBssEntry->lRssi << "\n";
+			//printIeInfo(pBssEntry);
+			std::stringstream ss;
+			printMacToStream(ss, pBssEntry->dot11Bssid);
+			
+//			formatTime((time_t)pBssEntry->ullTimestamp, accessPointTimeFormatted, sizeof accessPointTimeFormatted);
+			std::cout << currentTimeFormatted << " - RSSI from BssList [" << ss.str() << "]: " << pBssEntry->lRssi << " access point time: " << pBssEntry->ullTimestamp << "\n";
+		}
 	}
 
 	return;
@@ -422,7 +478,8 @@ int wmain()
 							NULL,
 							NULL);
 
-						WlanScan(hClient, (const GUID*)&(pIfInfo->InterfaceGuid), (const PDOT11_SSID)&(pConnectInfo->wlanAssociationAttributes.dot11Ssid), NULL, NULL);
+						//WlanScan(hClient, (const GUID*)&(pIfInfo->InterfaceGuid), (const PDOT11_SSID)&(pConnectInfo->wlanAssociationAttributes.dot11Ssid), NULL, NULL);
+						WlanScan(hClient, (const GUID*)&(pIfInfo->InterfaceGuid), NULL, NULL, NULL);
 						//WlanScan(hClient, pIfInfo.InterfaceGuid, pConnectInfo->wlanAssociationAttributes.dot11Ssid, NULL, NULL);
 
 						DWORD waitResult = WaitForSingleObject(callbackInfo.scanEvent, 15000);
@@ -431,6 +488,8 @@ int wmain()
 
 						while (1) {
 							std::this_thread::sleep_for(std::chrono::milliseconds(500));
+							WlanScan(hClient, (const GUID*)&(pIfInfo->InterfaceGuid), NULL, NULL, NULL);
+							DWORD waitResult = WaitForSingleObject(callbackInfo.scanEvent, 15000);
 						}
 
 
@@ -439,7 +498,6 @@ int wmain()
 
 
 					}
-
 				}
 			}
 		}
